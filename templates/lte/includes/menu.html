@@ -1,11 +1,26 @@
 {% load i18n %}
 
-<li class="header">{% trans 'pages'|capfirst %}</li>
-{% for page in menu %}
-  <li>
-    <a href="{{ page.get_admin_menu_url }}">
-      <i class="fa fa-{{ page.admin_icon_class }}"></i>
-      <span>{{ page.get_menu_name }}</span>
-    </a>
-  </li>
-{% endfor %}
+<li class="header">{% trans 'apps'|capfirst %}</li>
+{% if menu %}
+  {% for app in menu %}
+    <li class="treeview">
+      <a class="section" href="#">
+        <span>{{ app.name }}</span>
+        <i class="fa fa-angle-left pull-right"></i>
+      </a>
+      <ul class="treeview-menu">
+        {% for model in app.models %}
+          <li>
+            {% if model.admin_url %}
+              <a href="{{ model.admin_url }}">{{ model.name }}</a>
+            {% else %}
+              {{ model.name }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </li>
+  {% endfor %}
+{% else %}
+  <li>{% trans "No apps for you." %}</li>
+{% endif %}
