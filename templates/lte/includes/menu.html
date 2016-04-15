@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<li class="header">{% trans 'pages'|capfirst %}</li>
+{% for page in menu %}
+  <li>
+    <a href="{{ page.get_admin_menu_url }}">
+      <i class="fa fa-{{ page.admin_icon_class }}"></i>
+      <span>{{ page.get_menu_name }}</span>
+    </a>
+  </li>
+{% endfor %}

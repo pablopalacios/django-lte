@@ -1,0 +1,37 @@
+{% extends 'lte/base.html' %}
+{% load i18n %}
+
+{% block body_class %}skin-blue sidebar-mini{% endblock %}
+
+{% block content %}
+  <div class="wrapper">
+    {% include 'lte/includes/header.html' %}
+    {% include 'lte/includes/main_sidebar.html' %}
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          {% block page_header %}{% endblock %}
+          <small>{% block page_description %}{% endblock %}</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li>
+            <a href="{% url 'lte:index' %}">
+              <i class="fa fa-dashboard"></i>
+              {% trans 'Home' %}
+            </a>
+          </li>
+          {% block breadcrumb %}
+          {% endblock %}
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        {% block page_content %}{% endblock %}
+      </section><!-- /.content -->
+    </div><!-- /.content-wrapper -->
+    {% include 'lte/includes/footer.html' %}
+  </div><!-- ./wrapper -->
+{% endblock %}
