@@ -8,5 +8,7 @@ class LTEAdminSite(AdminSite):
     site_header = _('Site Administration')
     index_title = _('Dashboard')
 
+    index_template = 'lte/index.html'
+
 
 site = LTEAdminSite(name='lte')
