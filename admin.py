@@ -34,6 +34,11 @@ class LTEAdminSite(AdminSite):
                         'object_name': model._meta.object_name,
                         'perms': perms,
                     }
+                    if perms.get('change', False):
+                        try:
+                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
                     if app_label in app_dict:
                         app_dict[app_label]['models'].append(model_dict)
                     else:
