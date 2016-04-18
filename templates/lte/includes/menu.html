@@ -14,7 +14,7 @@
             {% if model.admin_url %}
               <a href="{{ model.admin_url }}">{{ model.name }}</a>
             {% else %}
-              {{ model.name }}
+              <a href="#">{{ model.name }}</a>
             {% endif %}
           </li>
         {% endfor %}
