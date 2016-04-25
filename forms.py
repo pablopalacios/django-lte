@@ -1,11 +1,10 @@
 from django import forms
-from django.contrib import auth
+from django.contrib.auth import forms as auth_forms
 from django.utils.translation import ugettext_lazy as _
 
+from authtools import forms as at_forms
+
 from lte_accounts import forms as accounts_forms
-
-
-User = auth.get_user_model()
 
 
 class LoginForm(accounts_forms.AuthForm):
@@ -41,3 +40,24 @@ class ProfileForm(accounts_forms.ProfileUpdate):
                 'class': 'form-control',
             }),
         }
+
+
+class PasswordUpdateForm(auth_forms.PasswordChangeForm):
+    old_password = forms.CharField(
+        label=_('Old password'),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    new_password1 = forms.CharField(
+        label=_('New password'),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+        }),
+    )
+    new_password2 = forms.CharField(
+        label=_('New password confirmation'),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+        })
+    )

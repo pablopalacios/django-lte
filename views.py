@@ -60,6 +60,7 @@ class ProfileUpdateView(AdminPermissionViewMixin, generic.UpdateView):
 
 
 class PasswordChangeView(AdminPermissionViewMixin, at_views.PasswordChangeView):
+    form_class = forms.PasswordUpdateForm
     success_url = reverse_lazy('admin:profile')
     template_name = 'lte/accounts/password_change.html'
 
