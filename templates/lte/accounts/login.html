@@ -1,35 +1,54 @@
+{% extends 'lte/base.html' %}
 {% load i18n %}
-<div class="login-box">
-  <div class="login-logo">
-    <a href=""><b>{% trans 'admin'|capfirst %}</b></a>
-  </div>
-  <div class="login-box-body">
-    <form method="post">{% csrf_token %}
-      <div class="form-group has-feedback">
-        {{ form.username }}
-        <i class="fa fa-envelope form-control-feedback"></i>
-      </div>
-      <div class="form-group has-feedback">
-        {{ form.password }}
-        <i class="fa fa-lock form-control-feedback"></i>
-      </div>
-      <div class="row">
-        <div class="col-xs-8">
-          <div class="checkbox icheck">
-            <label>
-              {{ form.remember_me }} {{ form.remember_me.label }}
-            </label>
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/skins/square/blue.css">
+{% endblock %}
+
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+  <div class="login-box">
+    <div class="login-logo">
+      <b>{% trans 'Django'|capfirst %}</b>LTE
+    </div>
+    <div class="login-box-body">
+      <form method="post">{% csrf_token %}
+        <div class="form-group has-feedback">
+          {{ form.username }}
+          <i class="fa fa-envelope form-control-feedback"></i>
+        </div>
+        <div class="form-group has-feedback">
+          {{ form.password }}
+          <i class="fa fa-lock form-control-feedback"></i>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">
+            <div class="checkbox icheck">
+              <label>
+                {{ form.remember_me }} {{ form.remember_me.label }}
+              </label>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <button type="submit" class="btn btn-primary btn-block btn-flat">
+              {% trans 'Sign In' %}
+            </button>
           </div>
         </div>
-        <div class="col-xs-4">
-          <button type="submit" class="btn btn-primary btn-block btn-flat">
-            {% trans 'Sign In' %}
-          </button>
-        </div>
-      </div>
-    </form>
-    <a href="{% url 'admin:password_reset' %}">
-      {% trans 'I forgot my password' %}
-    </a>
+      </form>
+      <a href="{% url 'admin:password_reset' %}">
+        {% trans 'I forgot my password' %}
+      </a>
+    </div>
   </div>
-</div>
+{% endblock %}
+
+{% block extra_body %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
+  <script>
+   $(function () {
+       $('.icheck').iCheck({checkboxClass: 'icheckbox_square-blue'});
+   });
+  </script>
+{% endblock %}
