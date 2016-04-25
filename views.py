@@ -19,7 +19,7 @@ class AdminPermissionViewMixin(braces_views.UserPassesTestMixin):
         return user.is_active and user.is_staff
 
     def test_func(self, user):
-        return self.has_permission()
+        return self.has_permission(user)
 
 
 class LoginView(at_views.LoginView):
