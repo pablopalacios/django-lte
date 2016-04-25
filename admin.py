@@ -6,11 +6,16 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import capfirst
 
+from lte_accounts.forms import AuthForm
+
 
 class LTEAdminSite(AdminSite):
     site_title = _('AdminLTE')
     site_header = _('Site Administration')
     index_title = _('Dashboard')
+
+    login_form = AuthForm
+    login_template = 'accounts/lte/login.html'
 
     def get_menu(self, request):
         """
