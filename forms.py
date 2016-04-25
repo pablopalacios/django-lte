@@ -47,18 +47,21 @@ class PasswordUpdateForm(auth_forms.PasswordChangeForm):
         label=_('Old password'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
+            'placeholder': _('Old password'),
         })
     )
     new_password1 = forms.CharField(
         label=_('New password'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
+            'placeholder': _('New password'),
         }),
     )
     new_password2 = forms.CharField(
         label=_('New password confirmation'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
+            'placeholder': _('Repeat new password'),
         })
     )
 
