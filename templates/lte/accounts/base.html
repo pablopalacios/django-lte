@@ -1,0 +1,15 @@
+{% extends 'lte/base.html' %}
+{% load i18n %}
+
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+  <div class="login-box">
+    <div class="login-logo">
+      <b>{% trans 'Django'|capfirst %}</b>LTE
+    </div>
+    <div class="login-box-body">
+      {% block accounts_content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}
