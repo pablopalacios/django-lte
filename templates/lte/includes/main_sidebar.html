@@ -9,7 +9,7 @@
         <img src="{{ user.gravatar }}" class="img-circle" alt="{{ user.get_full_name }}">
       </div>
       <div class="pull-left info">
-        <p>{{ request.user.get_full_name }}</p>
+        <p>{{ user.get_full_name }}</p>
         <!-- Status -->
         <a href="{% url 'accounts:profile' %}">{% trans 'Edit Profile' %}</a>
       </div>
