@@ -6,7 +6,7 @@ from django.views import generic
 from authtools import views as at_views
 from braces import views as braces_views
 
-from lte_accounts import forms as accounts_forms
+from . import forms
 
 
 User = auth.get_user_model()
@@ -24,7 +24,7 @@ class AdminPermissionViewMixin(braces_views.UserPassesTestMixin):
 
 class LoginView(at_views.LoginView):
     template_name = 'lte/accounts/login.html'
-    form_class = accounts_forms.AuthForm
+    form_class = forms.LoginForm
     success_url = reverse_lazy('admin:profile')
 
     def set_session_expiration(self, form):
@@ -50,7 +50,7 @@ class ProfileDetailView(AdminPermissionViewMixin, generic.DetailView):
 
 
 class ProfileUpdateView(AdminPermissionViewMixin, generic.UpdateView):
-    form_class = accounts_forms.ProfileUpdate
+    form_class = forms.ProfileForm
     model = User
     success_url = reverse_lazy('admin:profile')
     template_name = 'lte/accounts/profile_update.html'
