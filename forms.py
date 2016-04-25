@@ -61,3 +61,14 @@ class PasswordUpdateForm(auth_forms.PasswordChangeForm):
             'class': 'form-control',
         })
     )
+
+
+class PasswordResetForm(auth_forms.PasswordResetForm):
+    email = forms.EmailField(
+        label=_('Email'),
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Your email'),
+        })
+    )

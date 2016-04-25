@@ -68,6 +68,7 @@ class PasswordChangeView(AdminPermissionViewMixin, at_views.PasswordChangeView):
 # Reset password views
 class PasswordResetView(at_views.PasswordResetView):
     email_template_name = 'lte/accounts/password_reset_email.html'
+    form_class = forms.PasswordResetForm
     success_url = reverse_lazy('admin:password_reset_done')
     template_name = 'lte/accounts/password_reset_view.html'
 
