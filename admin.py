@@ -1,4 +1,8 @@
+from functools import update_wrapper
+
 from django.apps import apps
+from django.conf import settings
+from django.conf.urls import include, url
 from django.contrib.admin import AdminSite
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
@@ -6,7 +10,7 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import capfirst
 
-from lte_accounts.forms import AuthForm
+from . import views
 
 
 class LTEAdminSite(AdminSite):
@@ -14,8 +18,82 @@ class LTEAdminSite(AdminSite):
     site_header = _('Site Administration')
     index_title = _('Dashboard')
 
-    login_form = AuthForm
-    login_template = 'accounts/lte/login.html'
+    def set_admin_view(self, view, cacheable=False):
+        """
+        Set admin views in the same way that wrap in AdminSite.get_urls does
+        """
+        def wrapper(*args, **kwargs):
+            return self.admin_view(view, cacheable)(*args, **kwargs)
+        return update_wrapper(wrapper, view)
+
+    def get_accounts_urls(self):
+        urlpatterns = [
+            url(r'^login/$', views.LoginView.as_view(), name='login'),
+            url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+            url(r'^profile/$', views.ProfileDetailView.as_view(), name='profile'),
+            url(r'^profile/edit/$', views.ProfileUpdateView.as_view(), name='profile_update'),
+            url(r'^password-change/$',
+                views.PasswordChangeView.as_view(),
+                name='password_change'
+            ),
+            url(r'^password-reset/$',
+                views.PasswordResetView.as_view(),
+                name='password_reset'
+            ),
+            url(r'^password-reset/done/$',
+                views.PasswordResetDoneView.as_view(),
+                name='password_reset_done'
+            ),
+            url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+                views.PasswordResetConfirmAndLoginView.as_view(),
+                name='password_reset_confirm'
+            ),
+        ]
+        return urlpatterns
+
+    def get_apps_urls(self):
+        urlpatterns = []
+        # Add in each model's views, and create a list of valid URLS for the
+        # app_index
+        valid_app_labels = []
+        for model, model_admin in six.iteritems(self._registry):
+            urlpatterns += [
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+            ]
+            if model._meta.app_label not in valid_app_labels:
+                valid_app_labels.append(model._meta.app_label)
+
+        # If there were ModelAdmins registered, we should have a list of app
+        # labels for which we need to allow access to the app_index view,
+        if valid_app_labels:
+            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+            urlpatterns += [
+                url(regex, self.set_admin_view(self.app_index), name='app_list'),
+            ]
+        return urlpatterns
+
+    def get_urls(self):
+        from django.conf.urls import url, include
+        from django.contrib.contenttypes import views as contenttype_views
+
+        if settings.DEBUG:
+            self.check_dependencies()
+
+        # Admin-site-wide views.
+        urlpatterns = [
+            url(r'^$', self.set_admin_view(self.index), name='index'),
+            url(r'^jsi18n/$', self.set_admin_view(self.i18n_javascript, cacheable=True), name='jsi18n'),
+            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
+                self.set_admin_view(contenttype_views.shortcut),
+                name='view_on_site'
+            ),
+        ]
+        # Accounts  views
+        urlpatterns += self.get_accounts_urls()
+        # Apps views
+        urlpatterns += self.get_apps_urls()
+
+        return urlpatterns
 
     def get_menu(self, request):
         """
