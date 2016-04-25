@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<h1>{% trans 'User Profile' %}</h1>
+
+<img src="{{ user.gravatar }}" alt="user gravatar">
+<dl>
+  <dt>{% trans 'name'|capfirst %}</dt>
+  <dd>{{ user.name }}</dd>
+  <dt>{% trans 'email'|capfirst %}</dt>
+  <dd>{{ user.email }}</dd>
+</dl>
+
+<a href="{% url 'admin:profile_update' %}">
+  {% trans 'Edit Profile' %}
+</a> |
+<a href="{% url 'admin:password_change' %}">
+  {% trans 'Change password' %}
+</a>
