@@ -42,14 +42,7 @@ class ProfileForm(accounts_forms.ProfileUpdate):
         }
 
 
-class PasswordUpdateForm(auth_forms.PasswordChangeForm):
-    old_password = forms.CharField(
-        label=_('Old password'),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('Old password'),
-        })
-    )
+class SetPasswordForm(auth_forms.SetPasswordForm):
     new_password1 = forms.CharField(
         label=_('New password'),
         widget=forms.PasswordInput(attrs={
@@ -62,6 +55,16 @@ class PasswordUpdateForm(auth_forms.PasswordChangeForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'placeholder': _('Repeat new password'),
+        })
+    )
+
+
+class PasswordUpdateForm(SetPasswordForm, auth_forms.PasswordChangeForm):
+    old_password = forms.CharField(
+        label=_('Old password'),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Old password'),
         })
     )
 
