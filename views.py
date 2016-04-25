@@ -77,3 +77,4 @@ class PasswordResetDoneView(at_views.PasswordResetDoneView):
 
 class PasswordResetConfirmAndLoginView(at_views.PasswordResetConfirmAndLoginView):
     template_name = 'lte/accounts/password_reset_confirm.html'
+    success_url = reverse_lazy('admin:profile')
