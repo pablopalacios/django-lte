@@ -31,45 +31,54 @@ class LTEAdminSite(AdminSite):
             url(r'^login/$', views.LoginView.as_view(), name='login'),
             url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
             url(r'^profile/$', views.ProfileDetailView.as_view(), name='profile'),
-            url(r'^profile/edit/$', views.ProfileUpdateView.as_view(), name='profile_update'),
+            url(r'^profile/edit/$',
+                views.ProfileUpdateView.as_view(),
+                name='profile_update',
+            ),
             url(r'^password-change/$',
                 views.PasswordChangeView.as_view(),
-                name='password_change'
+                name='password_change',
             ),
             url(r'^password-reset/$',
                 views.PasswordResetView.as_view(),
-                name='password_reset'
+                name='password_reset',
             ),
             url(r'^password-reset/done/$',
                 views.PasswordResetDoneView.as_view(),
-                name='password_reset_done'
+                name='password_reset_done',
             ),
             url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
                 views.PasswordResetConfirmAndLoginView.as_view(),
-                name='password_reset_confirm'
+                name='password_reset_confirm',
             ),
         ]
         return urlpatterns
 
-    def get_apps_urls(self):
-        urlpatterns = []
-        # Add in each model's views, and create a list of valid URLS for the
-        # app_index
-        valid_app_labels = []
-        for model, model_admin in six.iteritems(self._registry):
-            urlpatterns += [
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
-            ]
-            if model._meta.app_label not in valid_app_labels:
-                valid_app_labels.append(model._meta.app_label)
+    def create_model_url_regex(self, model):
+        """ Generates url regex for models (eg. ^blog/post/) """
+        return r'^{app}/{model}/'.format(
+            app=model._meta.app_label,
+            model=model._meta.model_name,
+        )
 
-        # If there were ModelAdmins registered, we should have a list of app
-        # labels for which we need to allow access to the app_index view,
-        if valid_app_labels:
-            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
-            urlpatterns += [
-                url(regex, self.set_admin_view(self.app_index), name='app_list'),
-            ]
+    def create_model_url(self, model, model_admin):
+        """ Generates CRUD urls for a model """
+        return url(self.create_model_url_regex(model), include(model_admin.urls))
+
+    def create_app_index_url(self, app_list):
+        """ Generates one url for all apps indexes """
+        apps_regex = '|'.join(app_list)
+        regex = r'^(?P<app_label>{})/$'.format(apps_regex)
+        return [url(regex, self.set_admin_view(self.app_index), name='app_list')]
+
+    def get_apps_urls(self):
+        """ Generates a url list for apps indexes and for apps models """
+        # First, creates urls for models
+        urlpatterns = [self.create_model_url(*model) for model in self._registry.items()]
+        # Then, creates urls for apps indexes
+        app_list = (model._meta.app_label for model, model_admin in self._registry.items())
+        if app_list:
+            urlpatterns += self.create_app_index_url(app_list)
         return urlpatterns
 
     def get_urls(self):
@@ -88,7 +97,7 @@ class LTEAdminSite(AdminSite):
                 name='view_on_site'
             ),
         ]
-        # Accounts  views
+        # Accounts views
         urlpatterns += self.get_accounts_urls()
         # Apps views
         urlpatterns += self.get_apps_urls()
