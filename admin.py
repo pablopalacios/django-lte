@@ -4,7 +4,9 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 
 from . import views
 
@@ -13,7 +15,24 @@ __all__ = ('LTEModelAdmin', 'site')
 
 
 class LTEModelAdmin(ModelAdmin):
-    pass
+
+    @property
+    def app_label(self):
+        return self.model._meta.app_label
+
+    @property
+    def model_name(self):
+        return self.model._meta.model_name
+
+    @method_decorator(csrf_protect)
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context)
+        response.template_name = self.change_list_template or [
+            'lte/%s/%s/change_list.html' % (self.app_label, self.model_name),
+            'lte/%s/change_list.html' % self.app_label,
+            'lte/change_list.html'
+        ]
+        return response
 
 
 class LTEAdminSite(AdminSite):
