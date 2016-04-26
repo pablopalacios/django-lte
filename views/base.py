@@ -23,10 +23,7 @@ class BaseAdminView(object):
     title = ''
 
     def get_menu(self):
-        """
-        Generates the admin menu based on app/model list.
-        It is basically the AdminSite.index method.
-        """
+        """ Generates the admin menu based on app list. """
         app_dict = {}
         for model, model_admin in self.registry.items():
             app_label = model._meta.app_label
@@ -36,40 +33,20 @@ class BaseAdminView(object):
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
-                    info = (app_label, model._meta.model_name)
-                    model_dict = {
-                        'name': capfirst(model._meta.verbose_name_plural),
-                        'object_name': model._meta.object_name,
-                        'perms': perms,
-                    }
-                    if perms.get('change', False):
-                        try:
-                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                        except NoReverseMatch:
-                            pass
-                    if app_label in app_dict:
-                        app_dict[app_label]['models'].append(model_dict)
-                    else:
+                    if app_label not in app_dict:
                         app_dict[app_label] = {
                             'name': apps.get_app_config(app_label).verbose_name,
-                            'app_label': app_label,
-                            'app_url': reverse(
+                            'label': app_label,
+                            'url': reverse(
                                 'admin:app_list',
                                 kwargs={'app_label': app_label},
                                 current_app=self.name,
                             ),
-                            'has_module_perms': has_module_perms,
-                            'models': [model_dict],
                         }
 
         # Sort the apps alphabetically.
         app_list = list(six.itervalues(app_dict))
         app_list.sort(key=lambda x: x['name'].lower())
-
-        # Sort the models alphabetically within each app.
-        for app in app_list:
-            app['models'].sort(key=lambda x: x['name'])
-
         return app_list
 
     def get_title(self):
