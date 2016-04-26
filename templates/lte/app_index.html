@@ -3,49 +3,41 @@
 
 {% if not is_popup %}
   {% block breadcrumb %}
-    {% for app in app_list %}
-      <li class="active">{{ app.name }}</li>
-    {% endfor %}
+    <li class="active">{{ app_name }}</li>
   {% endblock %}
 {% endif %}
 
 {% block page_header %}
-  {% for app in app_list %}
-    {{ app.name }}
-  {% endfor %}
+  {{ app_name }}
 {% endblock %}
 
 {% block page_content %}
   <div class="row">
     <div class="col-md-6">
-      {% for app in app_list %}
-        {% for model in app.models %}
-          <div class="box box-solid">
-            <div class="box-header">
-              <h3 class="box-title">
-                {% if model.admin_url %}
-                  <a href="{{ model.admin_url }}">{{ model.name }}</a>
-                {% else %}
-                  {{ model.name }}
-                {% endif %}
-              </h3>
-              <div class="box-tools pull-right">
-                {% if model.add_url %}
-                  <a class="btn btn-box-tool" href="{{ model.add_url }}" alt="{% trans 'Add' %}">
-                    <i class="fa fa-plus"></i>
-                  </a>
-                {% endif %}
-                {% if model.admin_url %}
-                  <a class="btn btn-box-tool" href="{{ model.admin_url }}" alt="{% trans 'Change' %}">
-                    <i class="fa fa-edit"></i>
-                  </a>
-                {% endif %}
-              </div>
+      {% for model in app_model_list %}
+        <div class="box box-solid">
+          <div class="box-header">
+            <h3 class="box-title">
+              {% if model.admin_url %}
+                <a href="{{ model.admin_url }}">{{ model.name }}</a>
+              {% else %}
+                {{ model.name }}
+              {% endif %}
+            </h3>
+            <div class="box-tools pull-right">
+              {% if model.add_url %}
+                <a class="btn btn-box-tool" href="{{ model.add_url }}" alt="{% trans 'Add' %}">
+                  <i class="fa fa-plus"></i>
+                </a>
+              {% endif %}
+              {% if model.admin_url %}
+                <a class="btn btn-box-tool" href="{{ model.admin_url }}" alt="{% trans 'Change' %}">
+                  <i class="fa fa-edit"></i>
+                </a>
+              {% endif %}
             </div>
           </div>
-        {% endfor %}
-      {% empty %}
-        <p>{% trans "You don't have permission to edit anything." %}</p>
+        </div>
       {% endfor %}
     </div>
   </div>
