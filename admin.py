@@ -18,6 +18,10 @@ class LTEAdminSite(AdminSite):
     site_header = _('Site Administration')
     index_title = _('Dashboard')
 
+    @property
+    def app_list(self):
+        return (model._meta.app_label for model, model_admin in self._registry.items())
+
     def set_admin_view(self, view, cacheable=False):
         """
         Set admin views in the same way that wrap in AdminSite.get_urls does
@@ -65,9 +69,9 @@ class LTEAdminSite(AdminSite):
         """ Generates CRUD urls for a model """
         return url(self.create_model_url_regex(model), include(model_admin.urls))
 
-    def create_app_index_url(self, app_list):
+    def create_app_index_url(self):
         """ Generates one url for all apps indexes """
-        apps_regex = '|'.join(app_list)
+        apps_regex = '|'.join(self.app_list)
         regex = r'^(?P<app_label>{})/$'.format(apps_regex)
         return [url(regex, self.set_admin_view(self.app_index), name='app_list')]
 
@@ -76,9 +80,8 @@ class LTEAdminSite(AdminSite):
         # First, creates urls for models
         urlpatterns = [self.create_model_url(*model) for model in self._registry.items()]
         # Then, creates urls for apps indexes
-        app_list = (model._meta.app_label for model, model_admin in self._registry.items())
-        if app_list:
-            urlpatterns += self.create_app_index_url(app_list)
+        if self.app_list:
+            urlpatterns += self.create_app_index_url()
         return urlpatterns
 
     def get_urls(self):
