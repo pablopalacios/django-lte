@@ -1,13 +1,10 @@
 from functools import update_wrapper
 
-from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.admin import AdminSite
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
-from django.utils.text import capfirst
 
 from . import views
 
@@ -15,7 +12,6 @@ from . import views
 class LTEAdminSite(AdminSite):
     site_title = _('DjangoLTE')
     site_header = _('Site Administration')
-    index_title = _('Dashboard')
 
     def get_urls(self):
         """ Main method to generate admin urlpatterns """
@@ -26,7 +22,7 @@ class LTEAdminSite(AdminSite):
             self.check_dependencies()
 
         # Admin Index
-        urlpatterns = [url(r'^$', views.IndexView.as_view(), name='index')]
+        urlpatterns = [url(r'^$', views.IndexView.as_view(registry=self._registry), name='index')]
         # Authentication app views
         urlpatterns += self.get_auth_app_urls()
         # Site wide views
@@ -118,7 +114,7 @@ class LTEAdminSite(AdminSite):
         """ Generates one url for all apps indexes """
         apps_regex = '|'.join(self.app_list)
         regex = r'^(?P<app_label>{})/$'.format(apps_regex)
-        return [url(regex, views.AppIndexView.as_view(), name='app_list')]
+        return [url(regex, views.AppIndexView.as_view(registry=self._registry), name='app_list')]
 
 
 site = LTEAdminSite(name='lte')

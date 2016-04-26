@@ -1,13 +1,16 @@
+from django.apps import apps
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.utils import six
+from django.utils.text import capfirst
+from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 
 class BaseAdminView(object):
 
-    def __init__(self, registry={}, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._registry = registry
-
+    registry = None
+    name = 'lte'
+    title = ''
 
     def get_menu(self):
         """
@@ -15,11 +18,11 @@ class BaseAdminView(object):
         It is basically the AdminSite.index method.
         """
         app_dict = {}
-        for model, model_admin in self._registry.items():
+        for model, model_admin in self.registry.items():
             app_label = model._meta.app_label
-            has_module_perms = model_admin.has_module_permission(request)
+            has_module_perms = model_admin.has_module_permission(self.request)
             if has_module_perms:
-                perms = model_admin.get_model_perms(request)
+                perms = model_admin.get_model_perms(self.request)
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
@@ -59,53 +62,59 @@ class BaseAdminView(object):
 
         return app_list
 
+    def get_title(self):
+        return self.title
+
     def get_context_data(self, **kw):
         context = super().get_context_data(**kw)
         context['menu'] = self.get_menu()
+        context['title'] = self.get_title()
         return context
 
 
 class IndexView(BaseAdminView, generic.TemplateView):
     template_name = 'lte/index.html'
+    title = _('Dashboard')
 
 
 class AppIndexView(BaseAdminView, generic.TemplateView):
     template_name = 'lte/app_index.html'
+    title = _('App name not implemented')
 
+    @property
+    def app_label(self):
+        return self.kwargs['app_label']
 
-class _BaseAdminView:
-    def index(self, request, extra_context=None):
-        menu = self.get_menu(request)
-        context = dict(
-            self.each_context(request),
-            title=self.index_title,
-            menu=menu,
-        )
-        context.update(extra_context or {})
-        request.current_app = self.name
-        return TemplateResponse(request, self.index_template or
-                                'lte/index.html', context)
+    @property
+    def app_name(self):
+        return apps.get_app_config(self.app_label).verbose_name
 
-    def app_index(self, request, app_label, extra_context=None):
+    def get_title(self):
+        return _('%(app)s administration') % {'app': self.app_name}
+
+    def get_context_data(self, **kw):
+        context = super().get_context_data(**kw)
+        context['app_label'] = self.app_label
+        context['app_list'] = self.get_models()
+        return context
+
+    def get_models(self):
         """
         App index view. It is a copy of AdminSite.app_index.
         """
-        menu = self.get_menu(request)
-
-        app_name = apps.get_app_config(app_label).verbose_name
         app_dict = {}
-        for model, model_admin in self._registry.items():
-            if app_label == model._meta.app_label:
-                has_module_perms = model_admin.has_module_permission(request)
+        for model, model_admin in self.registry.items():
+            if self.app_label == model._meta.app_label:
+                has_module_perms = model_admin.has_module_permission(self.request)
                 if not has_module_perms:
                     raise PermissionDenied
 
-                perms = model_admin.get_model_perms(request)
+                perms = model_admin.get_model_perms(self.request)
 
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
-                    info = (app_label, model._meta.model_name)
+                    info = (self.app_label, model._meta.model_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
                         'object_name': model._meta.object_name,
@@ -128,28 +137,14 @@ class _BaseAdminView:
                         # something to display, add in the necessary meta
                         # information.
                         app_dict = {
-                            'name': app_name,
-                            'app_label': app_label,
+                            'name': self.app_name,
+                            'app_label': self.app_label,
                             'app_url': '',
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }
-        if not app_dict:
-            raise Http404('The requested admin page does not exist.')
+
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
-        context = dict(
-            self.each_context(request),
-            title=_('%(app)s administration') % {'app': app_name},
-            app_list=[app_dict],
-            app_label=app_label,
-            menu=menu,
-        )
-        context.update(extra_context or {})
 
-        request.current_app = self.name
-
-        return TemplateResponse(request, self.app_index_template or [
-            'lte/%s/app_index.html' % app_label,
-            'lte/app_index.html'
-        ], context)
+        return [app_dict]
