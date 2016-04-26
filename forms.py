@@ -7,7 +7,7 @@ from authtools import forms as at_forms
 from lte_accounts import forms as accounts_forms
 
 
-class LoginForm(accounts_forms.AuthForm):
+class LoginForm(accounts_forms.LoginForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -29,9 +29,9 @@ class LoginForm(accounts_forms.AuthForm):
     )
 
 
-class ProfileForm(accounts_forms.ProfileUpdate):
+class ProfileForm(accounts_forms.ProfileForm):
 
-    class Meta(accounts_forms.ProfileUpdate.Meta):
+    class Meta(accounts_forms.ProfileForm.Meta):
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
