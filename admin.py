@@ -2,11 +2,18 @@ from functools import update_wrapper
 
 from django.conf import settings
 from django.conf.urls import include, url
-from django.contrib.admin import AdminSite
+from django.contrib.admin import AdminSite, ModelAdmin
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
 
 from . import views
+
+
+__all__ = ('LTEModelAdmin', 'site')
+
+
+class LTEModelAdmin(ModelAdmin):
+    pass
 
 
 class LTEAdminSite(AdminSite):
