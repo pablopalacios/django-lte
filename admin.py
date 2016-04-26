@@ -14,7 +14,7 @@ from . import views
 
 
 class LTEAdminSite(AdminSite):
-    site_title = _('AdminLTE')
+    site_title = _('DjangoLTE')
     site_header = _('Site Administration')
     index_title = _('Dashboard')
 
