@@ -88,17 +88,21 @@ class LTEAdminSite(AdminSite):
         if settings.DEBUG:
             self.check_dependencies()
 
-        # Admin-site-wide views.
-        urlpatterns = [
-            url(r'^$', self.set_admin_view(self.index), name='index'),
-            url(r'^jsi18n/$', self.set_admin_view(self.i18n_javascript, cacheable=True), name='jsi18n'),
+        # Admin Index
+        urlpatterns = [url(r'^$', self.set_admin_view(self.index), name='index')]
+        # Accounts views
+        urlpatterns += self.get_accounts_urls()
+        # Site wide views
+        urlpatterns += [
+            url(r'^jsi18n/$',
+                self.set_admin_view(self.i18n_javascript, cacheable=True),
+                name='jsi18n'
+            ),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
                 self.set_admin_view(contenttype_views.shortcut),
                 name='view_on_site'
             ),
         ]
-        # Accounts views
-        urlpatterns += self.get_accounts_urls()
         # Apps views
         urlpatterns += self.get_apps_urls()
 
