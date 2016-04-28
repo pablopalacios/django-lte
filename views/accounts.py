@@ -35,27 +35,30 @@ class LogoutView(base.NoCacheAdminViewMixin, at_views.LogoutView):
     url = reverse_lazy('admin:login')
 
 
-class ProfileDetailView(AdminPermissionViewMixin, generic.DetailView):
+class ProfileDetailView(base.PrivateAdminViewMixin, generic.DetailView):
     template_name = 'lte/accounts/profile.html'
+    title = _('Profile')
 
     def get_object(self):
         return self.request.user
 
 
-class ProfileUpdateView(AdminPermissionViewMixin, generic.UpdateView):
+class ProfileUpdateView(base.PrivateAdminViewMixin, generic.UpdateView):
     form_class = forms.ProfileForm
     model = User
     success_url = reverse_lazy('admin:profile')
     template_name = 'lte/accounts/profile_update.html'
+    title = _('Update Profile')
 
     def get_object(self):
         return self.request.user
 
 
-class PasswordChangeView(base.HasPermissionMixin, at_views.PasswordChangeView):
+class PasswordChangeView(base.PrivateAdminViewMixin, at_views.PasswordChangeView):
     form_class = forms.PasswordUpdateForm
     success_url = reverse_lazy('admin:profile')
     template_name = 'lte/accounts/password_change.html'
+    title = _('Change password')
 
 
 # Reset password views
