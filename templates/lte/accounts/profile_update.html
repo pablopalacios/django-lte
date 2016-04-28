@@ -1,6 +1,12 @@
 {% extends 'lte/accounts/base_profile.html' %}
 {% load i18n %}
 
+{% block page_description %}
+  <a class="btn btn-xs btn-primary" href="{% url 'admin:password_change' %}">
+    {% trans 'change password' %}
+  </a>
+{% endblock %}
+
 {% block breadcrumb %}
   <li>
     <a href="{% url 'admin:profile' %}">{% trans 'User Profile' %}</a>
