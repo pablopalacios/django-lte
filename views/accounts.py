@@ -1,22 +1,24 @@
 from django.contrib import auth
 from django.core.urlresolvers import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from authtools import views as at_views
 from braces import views as braces_views
 
 from .. import forms
-from .base import AdminPermissionViewMixin
+from . import base
 
 
 User = auth.get_user_model()
 
 
-class LoginView(at_views.LoginView):
-    template_name = 'lte/accounts/login.html'
+class LoginView(base.PublicAdminViewMixin, base.NoCacheAdminViewMixin, at_views.LoginView):
     form_class = forms.LoginForm
     success_url = reverse_lazy('admin:profile')
+    template_name = 'lte/accounts/login.html'
+    title = _('Login')
 
     def set_session_expiration(self, form):
         if form.cleaned_data['remember_me'] is False:
@@ -29,7 +31,7 @@ class LoginView(at_views.LoginView):
         return super().form_valid(form)
 
 
-class LogoutView(AdminPermissionViewMixin, at_views.LogoutView):
+class LogoutView(base.NoCacheAdminViewMixin, at_views.LogoutView):
     url = reverse_lazy('admin:login')
 
 
