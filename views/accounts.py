@@ -52,25 +52,28 @@ class ProfileUpdateView(AdminPermissionViewMixin, generic.UpdateView):
         return self.request.user
 
 
-class PasswordChangeView(AdminPermissionViewMixin, at_views.PasswordChangeView):
+class PasswordChangeView(base.HasPermissionMixin, at_views.PasswordChangeView):
     form_class = forms.PasswordUpdateForm
     success_url = reverse_lazy('admin:profile')
     template_name = 'lte/accounts/password_change.html'
 
 
 # Reset password views
-class PasswordResetView(at_views.PasswordResetView):
+class PasswordResetView(base.PublicAdminViewMixin, at_views.PasswordResetView):
     email_template_name = 'lte/accounts/password_reset_email.html'
     form_class = forms.PasswordResetForm
     success_url = reverse_lazy('admin:password_reset_done')
     template_name = 'lte/accounts/password_reset_view.html'
+    title = _('Password reset')
 
 
-class PasswordResetDoneView(at_views.PasswordResetDoneView):
+class PasswordResetDoneView(base.PublicAdminViewMixin, at_views.PasswordResetDoneView):
     template_name = 'lte/accounts/password_reset_done.html'
+    title = _('Password reset')
 
 
-class PasswordResetConfirmAndLoginView(at_views.PasswordResetConfirmAndLoginView):
+class PasswordResetConfirmAndLoginView(base.PublicAdminViewMixin, at_views.PasswordResetConfirmAndLoginView):
     form_class = forms.SetPasswordForm
     template_name = 'lte/accounts/password_reset_confirm.html'
     success_url = reverse_lazy('admin:profile')
+    title = _('Password reset confirm')
