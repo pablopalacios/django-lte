@@ -1,7 +1,12 @@
-{% extends 'lte/page.html' %}
+{% extends 'lte/accounts/base_profile.html' %}
 {% load i18n %}
 
-{% block page_header %}{% trans 'Update Profile' %}{% endblock %}
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'admin:profile' %}">{% trans 'User Profile' %}</a>
+  </li>
+  <li class="active">{% trans 'Update Profile' %}</li>
+{% endblock %}
 
 {% block page_content %}
   <div class="row">
